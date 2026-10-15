@@ -1,16 +1,44 @@
-# React + Vite
+# Miraflores Tax Workpaper
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A web-native tax workpaper built for the Miraflores AI case study.
 
-Currently, two official plugins are available:
+## Live Demo
+https://miraflores-workpaper.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What it does
+- Traces any return line to its exact source document in one click
+- 14 screens covering all major workpaper areas
+- Real-time shared review notes and audit log via Supabase PostgreSQL
+- Role enforcement (Preparer, Reviewer, Partner)
+- Surfaces 6 real errors found in the data packet
 
-## React Compiler
+## Tech Stack
+React, Vite, Tailwind CSS, Supabase, Vercel
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Screens
+1. Search — full text search across entire workpaper
+2. Return Summary — year over year comparison
+3. Documents — 74 source documents with extracted values
+4. Return Lines — every form line with source tracing
+5. Diagnostics — engine warnings and extraction errors
+6. Timeline — full engagement history
+7. Review and Sign-off — real-time shared notes via Supabase
+8. Depreciation — federal vs California vs AMT
+9. Carryovers — incoming and outgoing amounts
+10. What-If Scenarios — pre-computed alternatives
+11. K-1 Detail — partnership and S corporation
+12. Client Communications — questionnaire and messages
+13. State Split — California vs Texas allocation
+14. Books to Tax — Schedule C reconciliation
 
-## Expanding the Oxlint configuration
+## Running locally
+```bash
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Note: Create a `.env` file with your Supabase credentials:
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
