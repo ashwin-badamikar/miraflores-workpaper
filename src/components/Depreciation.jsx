@@ -1,7 +1,7 @@
 import { currentVersion, data } from '../data/dataHelpers'
 
 function formatCurrency(val) {
-  if (val === null || val === undefined) return '—'
+  if (val === null || val === undefined || isNaN(val)) return '—'
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val)
 }
 
@@ -9,21 +9,31 @@ export default function Depreciation() {
   const assets = currentVersion.assets || []
   const priorAssets = data.prior_years?.asset_records || []
 
-  // Merge current year depreciation with prior asset records for full detail
   const enriched = assets.map(a => {
     const prior = priorAssets.find(p => p.asset_id === a.asset_id)
-    return { ...a, prior }
+    const federal2025 = parseFloat(a.federal?.depreciation_2025) || 0
+    const california2025 = parseFloat(a.california?.depreciation_2025) || 0
+    const amt2025 = parseFloat(a.amt?.depreciation_2025) || 0
+    const accumulated = parseFloat(a.federal?.accumulated_end) || 0
+    return {
+      ...a,
+      federal2025,
+      california2025,
+      amt2025,
+      accumulated,
+      prior
+    }
   })
 
-  const totalFederal = assets.reduce((s, a) => s + (a.federal || 0), 0)
-  const totalCalifornia = assets.reduce((s, a) => s + (a.california || 0), 0)
-  const totalAMT = assets.reduce((s, a) => s + (a.amt || 0), 0)
+  const totalFederal = enriched.reduce((s, a) => s + a.federal2025, 0)
+  const totalCalifornia = enriched.reduce((s, a) => s + a.california2025, 0)
+  const totalAMT = enriched.reduce((s, a) => s + a.amt2025, 0)
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-1">Depreciation Schedule</h1>
       <p className="text-sm text-gray-500 mb-6">
-        2025 depreciation by asset — federal, California, and AMT. Click any row for prior year history.
+        2025 depreciation by asset — federal, California, and AMT.
       </p>
 
       {/* Totals */}
@@ -63,43 +73,41 @@ export default function Depreciation() {
             {enriched.map((asset, i) => (
               <tr key={asset.asset_id || i} className="border-b last:border-0 hover:bg-blue-50">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-sm">{asset.prior?.description || asset.asset_id}</div>
+                  <div className="font-medium text-sm">{asset.description || asset.asset_id}</div>
                   <div className="text-xs text-gray-400">
-                    {asset.prior?.placed_in_service
-                      ? `In service: ${asset.prior.placed_in_service}`
-                      : ''}
+                    {asset.placed_in_service ? `In service: ${asset.placed_in_service}` : ''}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">{asset.prior?.activity || '—'}</td>
+                <td className="px-4 py-3 text-xs text-gray-500">{asset.activity || '—'}</td>
                 <td className="px-4 py-3">
                   <span className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded">
-                    {asset.prior?.method || '—'}
+                    {asset.method || '—'}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-xs text-gray-500">
-                  {asset.prior?.life_years ? `${asset.prior.life_years} yr` : '—'}
+                  {asset.life_years ? `${asset.life_years} yr` : '—'}
                 </td>
                 <td className="px-4 py-3 text-right text-xs">
-                  {formatCurrency(asset.prior?.cost)}
+                  {formatCurrency(asset.cost)}
                 </td>
                 <td className="px-4 py-3 text-right text-xs text-gray-500">
                   {formatCurrency(asset.accumulated)}
                 </td>
                 <td className="px-4 py-3 text-right font-medium">
-                  {formatCurrency(asset.federal)}
+                  {formatCurrency(asset.federal2025)}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <span className={asset.california !== asset.federal ? 'text-orange-600 font-medium' : ''}>
-                    {formatCurrency(asset.california)}
+                  <span className={asset.california2025 !== asset.federal2025 ? 'text-orange-600 font-medium' : ''}>
+                    {formatCurrency(asset.california2025)}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <span className={asset.amt > 0 ? 'text-red-600 font-medium' : 'text-gray-400'}>
-                    {formatCurrency(asset.amt)}
+                  <span className={asset.amt2025 > 0 ? 'text-red-600 font-medium' : 'text-gray-400'}>
+                    {formatCurrency(asset.amt2025)}
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  {asset.prior?.disposed ? (
+                  {asset.disposed ? (
                     <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded">Disposed</span>
                   ) : (
                     <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Active</span>
@@ -126,8 +134,7 @@ export default function Depreciation() {
         )}
       </div>
 
-      {/* CA vs Federal differences note */}
-      {enriched.some(a => a.california !== a.federal) && (
+      {enriched.some(a => a.california2025 !== a.federal2025) && (
         <div className="mt-4 bg-orange-50 border border-orange-200 rounded-xl px-5 py-4">
           <div className="text-sm font-medium text-orange-700 mb-1">California vs Federal Differences</div>
           <div className="text-xs text-orange-600">

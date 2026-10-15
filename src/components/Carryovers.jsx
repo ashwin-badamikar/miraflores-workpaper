@@ -46,10 +46,9 @@ export default function Carryovers() {
   const incoming = data.prior_years?.carryovers_into_2025 || {}
   const outgoing = currentVersion.carryovers_out || {}
 
-  const federalIn = incoming.federal || {}
-  const californiaIn = incoming.california || {}
-  const federalOut = outgoing.federal || {}
-  const californiaOut = outgoing.california || {}
+  const fedOut = outgoing.federal || {}
+  const calOut = outgoing.california || {}
+  const calIn = incoming.california || {}
 
   return (
     <div>
@@ -75,56 +74,75 @@ export default function Carryovers() {
       <Section title="Capital Losses">
         <Row
           label="Short-term capital loss carryforward"
-          incoming={federalIn.capital_loss_short}
-          outgoing={federalOut.capital_loss_short}
+          incoming={incoming.capital_loss_short}
+          outgoing={fedOut.capital_loss_short}
         />
         <Row
           label="Long-term capital loss carryforward"
-          incoming={federalIn.capital_loss_long}
-          outgoing={federalOut.capital_loss_long}
+          incoming={incoming.capital_loss_long}
+          outgoing={fedOut.capital_loss_long}
         />
       </Section>
 
       <Section title="Passive Activity Losses">
         <Row
-          label="Rental passive loss carryforward"
-          incoming={federalIn.passive_loss_rental}
-          outgoing={federalOut.passive_loss_rental}
-          note="Sacramento rental activity"
+          label="1450 Fremont Way passive loss (Sacramento rental)"
+          incoming={incoming.passive_1450_fremont}
+          outgoing={fedOut.passive_1450_fremont}
+          note="Sacramento rental property"
         />
         <Row
-          label="Other passive loss carryforward"
-          incoming={federalIn.passive_loss_other}
-          outgoing={federalOut.passive_loss_other}
+          label="1200 Barton Hills passive loss (Austin rental)"
+          incoming={incoming.passive_1200_barton_hills}
+          outgoing={fedOut.passive_1200_barton_hills}
+          note="Austin rental property — sold in 2025"
         />
       </Section>
 
       <Section title="Credits and Other">
         <Row
           label="Charitable contribution carryforward"
-          incoming={federalIn.charitable_contribution}
-          outgoing={federalOut.charitable_contribution}
+          incoming={incoming.charitable}
+          outgoing={fedOut.charitable}
         />
         <Row
           label="Section 1231 loss carryforward"
-          incoming={federalIn.section_1231_losses}
-          outgoing={federalOut.section_1231_losses}
+          incoming={incoming.section_1231_losses}
+          outgoing={fedOut.section_179}
         />
         <Row
           label="AMT minimum tax credit"
-          incoming={federalIn.amt_credit}
-          outgoing={federalOut.amt_credit}
-          note="Form 8801 — may be usable in 2026"
+          incoming={incoming.amt_credit}
+          outgoing={fedOut.minimum_tax_credit_from_2025_amt}
+          note="Form 8801 — usable in 2026"
         />
         <Row
           label="Foreign tax credit carryforward"
-          incoming={federalIn.foreign_tax_credit}
-          outgoing={federalOut.foreign_tax_credit}
+          incoming={incoming.foreign_tax_credit}
+          outgoing={null}
         />
         <Row
           label="QBI loss carryforward"
-          incoming={federalIn.qbi_loss}
-          outgoing={federalOut.qbi_loss}
+          incoming={incoming.qbi_loss}
+          outgoing={null}
+        />
+        <Row
+          label="SEP contribution not deductible for 2025"
+          incoming={null}
+          outgoing={fedOut.sep_contribution_not_deductible_for_2025}
+          note="Carries to 2026 SEP limit calculation"
+        />
+        <Row
+          label="S corp stock basis end of year"
+          incoming={null}
+          outgoing={fedOut.scorp_stock_basis_end}
+          note="Lindqvist Family Woodworks — basis exhausted"
+        />
+        <Row
+          label="Ridgeline capital account end of year"
+          incoming={null}
+          outgoing={fedOut.ridgeline_capital_account_end}
+          note="Ridgeline Real Estate Fund III LP"
         />
       </Section>
 
@@ -133,39 +151,26 @@ export default function Carryovers() {
       <Section title="Capital Losses">
         <Row
           label="Short-term capital loss carryforward"
-          incoming={californiaIn.capital_loss_short}
-          outgoing={californiaOut.capital_loss_short}
+          incoming={calIn.capital_loss_short}
+          outgoing={calOut.capital_loss}
         />
         <Row
           label="Long-term capital loss carryforward"
-          incoming={californiaIn.capital_loss_long}
-          outgoing={californiaOut.capital_loss_long}
+          incoming={calIn.capital_loss_long}
+          outgoing={null}
         />
       </Section>
 
       <Section title="Passive Activity Losses">
         <Row
-          label="Rental passive loss carryforward"
-          incoming={californiaIn.passive_loss_rental}
-          outgoing={californiaOut.passive_loss_rental}
+          label="1450 Fremont Way passive loss"
+          incoming={calIn.passive_1450_fremont}
+          outgoing={calOut.passive}
         />
         <Row
-          label="Other passive loss carryforward"
-          incoming={californiaIn.passive_loss_other}
-          outgoing={californiaOut.passive_loss_other}
-        />
-      </Section>
-
-      <Section title="Other California">
-        <Row
-          label="Charitable contribution carryforward"
-          incoming={californiaIn.charitable_contribution}
-          outgoing={californiaOut.charitable_contribution}
-        />
-        <Row
-          label="AMT credit"
-          incoming={californiaIn.amt_credit}
-          outgoing={californiaOut.amt_credit}
+          label="1200 Barton Hills passive loss"
+          incoming={calIn.passive_1200_barton_hills}
+          outgoing={null}
         />
       </Section>
 
@@ -175,7 +180,7 @@ export default function Carryovers() {
         <div className="text-xs text-blue-600 leading-relaxed">
           After the move to Texas, California will only tax California-source income in 2026.
           The Sacramento rental and Ridgeline's California share remain California-source.
-          The AMT minimum tax credit carrying out of 2025 may be usable on Form 8801 next year.
+          The AMT minimum tax credit of $3,871 carrying out of 2025 may be usable on Form 8801 next year.
         </div>
       </div>
     </div>
